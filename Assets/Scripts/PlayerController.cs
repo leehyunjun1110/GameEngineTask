@@ -12,10 +12,10 @@ public class PlayerController : MonoBehaviour
     private Transform m_Transform;
 
     [SerializeField]
-    private float characterSpeed = 3.0f;
+    private float characterSpeed = 1.0f;
 
     [SerializeField]
-    private float characterJumpSpace = 5.0f;
+    private float characterJumpSpace = 0.5f;
 
     public GameObject m_Attack;
 
@@ -24,6 +24,7 @@ public class PlayerController : MonoBehaviour
     {
         m_Animator = GetComponent<Animator>();
         m_Transform = GetComponent<Transform>();
+        
         m_Attack.SetActive(false);
     }
 
@@ -43,7 +44,7 @@ public class PlayerController : MonoBehaviour
             m_Animator.SetTrigger("Attack");
             isAbleAttack = false;
             isMovable = false;
-            Invoke("DisableAttack", 1f);
+            Invoke("DisableAttack", 0.7f);
         }
     }
 
@@ -59,13 +60,13 @@ public class PlayerController : MonoBehaviour
         if (Input.GetKey(KeyCode.LeftShift))
         {
             shiftdown = true;
-            characterSpeed = 6.0f;
+            characterSpeed = 1f;
             m_Animator.SetBool("IsRun", true);
         }
         else
         {
             shiftdown = false;
-            characterSpeed = 3.0f;
+            characterSpeed = 2f;
             m_Animator.SetBool("IsRun", false);
         }
     }
@@ -74,6 +75,10 @@ public class PlayerController : MonoBehaviour
         if ((Input.GetKeyDown(KeyCode.UpArrow) && groundCheck && isMovable) || (Input.GetKeyDown(KeyCode.Space) && groundCheck && isMovable))
         {
             m_Animator.SetTrigger("Jump");
+            if (shiftdown == true)
+            {
+                characterJumpSpace = 100.0f;
+            }
             m_Rb.AddForce(Vector2.up * characterJumpSpace);
             groundCheck = false;
         }
@@ -84,14 +89,14 @@ public class PlayerController : MonoBehaviour
         if (Input.GetKey(KeyCode.LeftArrow) && isMovable)
         {
             m_Transform.Translate(new Vector2(-characterSpeed, 0) * Time.deltaTime);
-            m_Transform.localScale = new Vector3(-2.5f, 2.5f);
+            m_Transform.localScale = new Vector3(-0.5f, 0.5f);
             m_Animator.SetBool("IsWalk", true);
             return;
         }
         if (Input.GetKey(KeyCode.RightArrow) && isMovable)
         {
             m_Transform.Translate(new Vector2(characterSpeed, 0) * Time.deltaTime);
-            m_Transform.localScale = new Vector3(2.5f, 2.5f);
+            m_Transform.localScale = new Vector3(0.5f, 0.5f);
             m_Animator.SetBool("IsWalk", true);
             return;
         }
