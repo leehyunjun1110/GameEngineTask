@@ -3,23 +3,18 @@ using UnityEngine.SceneManagement;
 
 public class PlayerController : MonoBehaviour
 {
-    [SerializeField]
-    private Animator m_Animator;
-
-    [SerializeField]
-    private Rigidbody2D m_Rb;
-
+    [Header("PlayerFunctionAnnounced")]
+    [SerializeField] private Animator m_Animator;
+    [SerializeField] private Rigidbody2D m_Rb;
     private Transform m_Transform;
-
-    [SerializeField]
-    private float characterSpeed = 1.0f;
-
-    [SerializeField]
-    private float characterJumpSpace = 0.5f;
-
+    [SerializeField] private float characterSpeed = 2f;
+    [SerializeField] private float characterJumpSpace = 200.0f;
     public GameObject m_Attack;
 
-    public bool groundCheck = false, shiftdown = false, isAbleAttack = true, isMovable = true;
+    [SerializeField] private Transform groundCheckPoint;
+    [SerializeField] private float groundCheckDistance = 0.1f;
+
+    public bool shiftdown = false, isAbleAttack = true, isMovable = true, groundCheck = true;
     void Start()
     {
         m_Animator = GetComponent<Animator>();
@@ -34,6 +29,23 @@ public class PlayerController : MonoBehaviour
         Move();
         JumpCheck();
         AttackCheck();
+        groundCheck = GroundCheck();
+    }
+
+    private bool GroundCheck()
+    {
+        RaycastHit2D[] hits = Physics2D.RaycastAll(groundCheckPoint.position, Vector2.down, groundCheckDistance);
+        bool gc = false;
+        Debug.DrawRay(groundCheckPoint.position, Vector2.down * groundCheckDistance, Color.red);
+        foreach(RaycastHit2D hit in hits)
+        {
+            if (hit.collider.gameObject.CompareTag("Ground"))
+            {
+                gc = true;
+                return gc;
+            }
+        }
+        return gc;
     }
 
     private void AttackCheck()
@@ -60,7 +72,7 @@ public class PlayerController : MonoBehaviour
         if (Input.GetKey(KeyCode.LeftShift))
         {
             shiftdown = true;
-            characterSpeed = 1f;
+            characterSpeed = 4f;
             m_Animator.SetBool("IsRun", true);
         }
         else
@@ -77,7 +89,11 @@ public class PlayerController : MonoBehaviour
             m_Animator.SetTrigger("Jump");
             if (shiftdown == true)
             {
-                characterJumpSpace = 100.0f;
+                characterJumpSpace = 400.0f;
+            }
+            else
+            {
+                characterJumpSpace = 300.0f;
             }
             m_Rb.AddForce(Vector2.up * characterJumpSpace);
             groundCheck = false;
@@ -89,40 +105,34 @@ public class PlayerController : MonoBehaviour
         if (Input.GetKey(KeyCode.LeftArrow) && isMovable)
         {
             m_Transform.Translate(new Vector2(-characterSpeed, 0) * Time.deltaTime);
-            m_Transform.localScale = new Vector3(-0.5f, 0.5f);
+            m_Transform.localScale = new Vector3(-1f, 1f);
             m_Animator.SetBool("IsWalk", true);
             return;
         }
         if (Input.GetKey(KeyCode.RightArrow) && isMovable)
         {
             m_Transform.Translate(new Vector2(characterSpeed, 0) * Time.deltaTime);
-            m_Transform.localScale = new Vector3(0.5f, 0.5f);
+            m_Transform.localScale = new Vector3(1f, 1f);
             m_Animator.SetBool("IsWalk", true);
             return;
         }
         m_Animator.SetBool("IsWalk", false);
     }
-
-    private void OnCollisionEnter2D(Collision2D collision)
-    {
-        if (collision.gameObject.CompareTag("Ground"))
-        {
-            groundCheck = true;
-        }
-    }
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (collision.gameObject.CompareTag("Door1"))
+        switch(collision.gameObject.tag)
         {
-            SceneManager.LoadScene("World2");
-        }
-        if (collision.gameObject.CompareTag("Door2"))
-        {
-            SceneManager.LoadScene("World3");
-        }
-        if (collision.gameObject.CompareTag("Door3"))
-        {
-            SceneManager.LoadScene("End");
+            case "Door1":
+                SceneManager.LoadScene("World2");
+                break;
+
+            case "Door2":
+                SceneManager.LoadScene("World3");
+                break;
+
+            case "Door3":
+                SceneManager.LoadScene("End");
+                break;
         }
     }
 }
