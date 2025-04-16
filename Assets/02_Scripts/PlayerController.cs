@@ -3,6 +3,8 @@ using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEditor.SceneManagement;
+using Unity.VisualScripting;
 
 public class PlayerController : MonoBehaviour
 {
@@ -13,7 +15,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float characterSpeed = 2f;
     [SerializeField] private float characterJumpSpace = 200.0f;
     public GameObject m_Attack;
-    public bool shiftdown = false, isAbleAttack = true, isMovable = true;
+    public bool shiftdown = false, isAbleAttack = true, isMovable = true, isJumpable = true;
 
     [Header("PlayerJumpFunc")]
     private KeyCode[] jumpKeys = { KeyCode.UpArrow, KeyCode.Space };
@@ -25,13 +27,24 @@ public class PlayerController : MonoBehaviour
     [Header("PlayerVariables")]
     [SerializeField] private float attackCoolDown = 0.7f;
     [SerializeField] private int playerHealth = 3;
+    private float originCharacterSpeed;
+    [SerializeField] private float shiftCool = 5f;   // 쿨타임 시간 (초 단위)
+    [SerializeField] private GameObject shiftCoolPanel;
+    [SerializeField] private RectTransform shiftCooldownUI; // UI 패널 RectTransform
+
+    [Header("AudioSource")]
+    public AudioSource audioSource;
+    public AudioClip swordAttackSound;
+    public AudioClip walkSound;
+    //public AudioClip 
 
     void Start()
     {
         m_Animator = GetComponent<Animator>();
         m_Transform = GetComponent<Transform>();
-        
+        originCharacterSpeed = characterSpeed;
         m_Attack.SetActive(false);
+        shiftCoolPanel.SetActive(false);
     }
 
     void Update()
@@ -65,13 +78,13 @@ public class PlayerController : MonoBehaviour
         if (Input.GetKey(KeyCode.LeftShift))
         {
             shiftdown = true;
-            characterSpeed = 4f;
+            characterSpeed = originCharacterSpeed * 2;
             m_Animator.SetBool("IsRun", true);
         }
         else
         {
             shiftdown = false;
-            characterSpeed = 2f;
+            characterSpeed = originCharacterSpeed;
             m_Animator.SetBool("IsRun", false);
         }
     }
@@ -85,13 +98,56 @@ public class PlayerController : MonoBehaviour
                 if (Input.GetKeyDown(key))
                 {
                     m_Animator.SetTrigger("Jump");
-                    characterJumpSpace = shiftdown ? 400.0f : 300.0f;
+                    characterJumpSpace = shiftdown && isJumpable ? 400.0f : 200.0f;
+                    if (shiftdown && isJumpable)
+                    {
+                        isJumpable = false;
+                        StartCoroutine(Shift());
+                    }
                     m_Rb.AddForce(Vector2.up * characterJumpSpace);
                     lastJumpTime = Time.time;
                     break;
                 }
             }
         }
+    }
+
+    IEnumerator Shift()
+    {
+        if (shiftCoolPanel != null)
+        {
+            shiftCoolPanel.SetActive(true);
+        }
+
+        float elapsed = 0f;
+        float startYScale = 1f;
+
+        // 쿨타임 진행 (Y 스케일 점점 줄어듦)
+        while (elapsed < shiftCool)
+        {
+            elapsed += Time.deltaTime;
+            float t = Mathf.Clamp01(elapsed / shiftCool);
+            float newYScale = Mathf.Lerp(startYScale, 0f, t);
+
+            if (shiftCooldownUI != null)
+            {
+                Vector3 scale = shiftCooldownUI.localScale;
+                shiftCooldownUI.localScale = new Vector3(scale.x, newYScale, scale.z);
+            }
+
+            yield return null;
+        }
+
+        // 쿨타임 종료 처리
+        isJumpable = true;
+
+        if (shiftCooldownUI != null)
+        {
+            shiftCooldownUI.localScale = new Vector3(1f, 1f, 1f); // 초기화
+            shiftCoolPanel.SetActive(false);
+        }
+
+        yield break;
     }
     private bool GroundCheck()
     {

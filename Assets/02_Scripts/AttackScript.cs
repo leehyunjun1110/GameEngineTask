@@ -8,14 +8,19 @@ public class AttackScript : MonoBehaviour
     private PlayerController playerController;
 
     [SerializeField]
-    private List<GameObject> targets = new List<GameObject>();
+    private const string enemy = "Enemy";
+    [SerializeField]
+    private const string dummy = "Dummy";
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        for (int i = 0; i < targets.Count; i++)
+        if (collision.gameObject.CompareTag(enemy))
         {
-            if (targets[i].gameObject == collision.gameObject)
-                Destroy(collision.gameObject);
+            Destroy(collision.gameObject);
+            playerController.m_Attack.SetActive(false);
         }
-        playerController.m_Attack.SetActive(false);
+        else if (collision.gameObject.CompareTag(dummy))
+        {
+            
+        }
     }
 }
