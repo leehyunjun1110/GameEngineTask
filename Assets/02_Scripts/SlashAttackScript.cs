@@ -2,18 +2,14 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class AttackScript : MonoBehaviour
+public class SlashAttackScript : MonoBehaviour
 {
-    [SerializeField]
-    private PlayerController playerController;
-
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        switch(collision.gameObject.tag)
+        switch (collision.gameObject.tag)
         {
             case "Enemy":
                 Destroy(collision.gameObject);
-                playerController.m_Attack.SetActive(false);
                 break;
             case "Dummy":
                 DummyScript dummy = collision.gameObject.GetComponent<DummyScript>();

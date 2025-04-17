@@ -11,11 +11,11 @@ public class PlayerController : MonoBehaviour
     [Header("PlayerFunctionAnnounced")]
     [SerializeField] private Animator m_Animator;
     [SerializeField] private Rigidbody2D m_Rb;
-    private Transform m_Transform;
+    static private Transform m_Transform;
     [SerializeField] private float characterSpeed = 2f;
     [SerializeField] private float characterJumpSpace = 200.0f;
     public GameObject m_Attack;
-    public bool shiftdown = false, isAbleAttack = true, isMovable = true, isJumpable = true;
+    public bool shiftdown = false, isAbleAttack = true, isMovable = true, isJumpable = true, isAbleZKey = true, isAbleXKey = true;
 
     [Header("PlayerJumpFunc")]
     private KeyCode[] jumpKeys = { KeyCode.UpArrow, KeyCode.Space };
@@ -25,18 +25,33 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float groundCheckCooldown = 0.2f;
 
     [Header("PlayerVariables")]
-    [SerializeField] private float attackCoolDown = 0.7f;
-    [SerializeField] private int playerHealth = 3;
+    [SerializeField] private float attackCoolDown = 1.1f;
+    //[SerializeField] private int playerHealth = 3;
     private float originCharacterSpeed;
-    [SerializeField] private float shiftCool = 5f;   // 쿨타임 시간 (초 단위)
+
+    [Header("ShiftSkill")]
+    [SerializeField] private float shiftCool = 3f;
     [SerializeField] private GameObject shiftCoolPanel;
-    [SerializeField] private RectTransform shiftCooldownUI; // UI 패널 RectTransform
+    [SerializeField] private RectTransform shiftCooldownUI;
+
+    [Header("ZKeySkill")]
+    [SerializeField] private float ZKeyCool = 3f;
+    [SerializeField] private GameObject ZKeyCoolPanel;
+    [SerializeField] private RectTransform ZKeyCooldownUI;
+
+    [Header("XKeySkill")]
+    [SerializeField] private float XKeyCool = 4f;
+    [SerializeField] private GameObject XKeyCoolPanel;
+    [SerializeField] private RectTransform XKeyCooldownUI;
+    [SerializeField] private GameObject swordSlashPrefab;
+    [SerializeField] private float XKeyRbAttackspeed;
+    [SerializeField] private Transform firePoint;
+    private Vector2 direction;
 
     [Header("AudioSource")]
     public AudioSource audioSource;
     public AudioClip swordAttackSound;
     public AudioClip walkSound;
-    //public AudioClip 
 
     void Start()
     {
@@ -45,6 +60,7 @@ public class PlayerController : MonoBehaviour
         originCharacterSpeed = characterSpeed;
         m_Attack.SetActive(false);
         shiftCoolPanel.SetActive(false);
+        XKeyCoolPanel.SetActive(false);
     }
 
     void Update()
@@ -56,6 +72,11 @@ public class PlayerController : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.A) && isAbleAttack)
         {
             StartCoroutine(AttackCheck());
+        }
+
+        if (Input.GetKeyDown(KeyCode.X) && isAbleXKey)
+        {
+            StartCoroutine(XKeyAttack());
         }
     }
 
@@ -72,6 +93,7 @@ public class PlayerController : MonoBehaviour
         isAbleAttack = true;
         isMovable = true;
     }
+
 
     private void ShiftCheck()
     {
@@ -102,7 +124,7 @@ public class PlayerController : MonoBehaviour
                     if (shiftdown && isJumpable)
                     {
                         isJumpable = false;
-                        StartCoroutine(Shift());
+                        StartCoroutine(ShiftJump());
                     }
                     m_Rb.AddForce(Vector2.up * characterJumpSpace);
                     lastJumpTime = Time.time;
@@ -112,7 +134,7 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    IEnumerator Shift()
+    IEnumerator ShiftJump()
     {
         if (shiftCoolPanel != null)
         {
@@ -138,13 +160,60 @@ public class PlayerController : MonoBehaviour
             yield return null;
         }
 
-        // 쿨타임 종료 처리
         isJumpable = true;
 
         if (shiftCooldownUI != null)
         {
             shiftCooldownUI.localScale = new Vector3(1f, 1f, 1f); // 초기화
             shiftCoolPanel.SetActive(false);
+        }
+
+        yield break;
+    }
+    IEnumerator XKeyAttack()
+    {
+        direction = m_Transform.transform.localScale.x > 0 ? Vector2.right : Vector2.left;
+        m_Animator.SetTrigger("XKeyAttack");
+        isAbleXKey = false;
+        yield return new WaitForSeconds(0.3f);
+        GameObject slash = Instantiate(swordSlashPrefab, firePoint.position, Quaternion.identity);
+
+        Rigidbody2D rb = slash.GetComponent<Rigidbody2D>();
+        if (rb != null)
+        {
+            rb.velocity = direction.normalized * XKeyRbAttackspeed;
+        }
+
+
+        if (XKeyCoolPanel != null)
+        {
+            XKeyCoolPanel.SetActive(true);
+        }
+
+        float elapsed = 0f;
+        float startYScale = 1f;
+
+        while (elapsed < XKeyCool)
+        {
+            elapsed += Time.deltaTime;
+            float t = Mathf.Clamp01(elapsed / XKeyCool);
+            float newYScale = Mathf.Lerp(startYScale, 0f, t);
+
+            if (XKeyCooldownUI != null)
+            {
+                Vector3 scale = XKeyCooldownUI.localScale;
+                XKeyCooldownUI.localScale = new Vector3(scale.x, newYScale, scale.z);
+            }
+
+            yield return null;
+        }
+
+        isAbleXKey = true;
+
+        if (XKeyCooldownUI != null)
+        {
+            XKeyCooldownUI.localScale = new Vector3(1f, 1f, 1f); // 초기화
+            XKeyCoolPanel.SetActive(false);
         }
 
         yield break;
