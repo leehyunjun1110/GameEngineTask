@@ -5,6 +5,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEditor.SceneManagement;
 using Unity.VisualScripting;
+using Unity.Mathematics;
 
 public class PlayerController : MonoBehaviour
 {
@@ -172,11 +173,21 @@ public class PlayerController : MonoBehaviour
     }
     IEnumerator XKeyAttack()
     {
-        direction = m_Transform.transform.localScale.x > 0 ? Vector2.right : Vector2.left;
         m_Animator.SetTrigger("XKeyAttack");
         isAbleXKey = false;
         yield return new WaitForSeconds(0.3f);
-        GameObject slash = Instantiate(swordSlashPrefab, firePoint.position, Quaternion.identity);
+        direction = m_Transform.transform.localScale.x > 0 ? Vector2.right : Vector2.left;
+
+        Quaternion isRight;
+        if (direction == Vector2.right)
+        {
+            isRight = Quaternion.Euler(0f, 0f, 0f);
+        }
+        else
+        {
+            isRight = Quaternion.Euler(0f, 180f, 0f);
+        }
+        GameObject slash = Instantiate(swordSlashPrefab, firePoint.position, isRight);
 
         Rigidbody2D rb = slash.GetComponent<Rigidbody2D>();
         if (rb != null)
