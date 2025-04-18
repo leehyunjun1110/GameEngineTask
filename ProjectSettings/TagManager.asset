@@ -5,9 +5,6 @@ TagManager:
   serializedVersion: 2
   tags:
   - Ground
-  - Door1
-  - Door2
-  - Door3
   - Enemy
   - Dummy
   layers:

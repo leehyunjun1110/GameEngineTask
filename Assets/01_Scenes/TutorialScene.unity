@@ -6945,8 +6945,8 @@ GameObject:
   - component: {fileID: 894256223}
   - component: {fileID: 894256222}
   m_Layer: 0
-  m_Name: Dimensional_Portal_0
-  m_TagString: Door1
+  m_Name: Door1
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -8126,7 +8126,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7357138058719091635, guid: da3d34176ce742e4dbf5d278166a66c1, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -3.69
+      value: -3
       objectReference: {fileID: 0}
     - target: {fileID: 7357138058719091635, guid: da3d34176ce742e4dbf5d278166a66c1, type: 3}
       propertyPath: m_LocalPosition.y

@@ -342,18 +342,18 @@ public class PlayerController : MonoBehaviour
     }
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        switch(collision.gameObject.tag)
+        switch(collision.gameObject.name)
         {
             case "Door1":
-                SceneManager.LoadScene("World2");
+                SceneManager.LoadScene("World1");
                 break;
 
             case "Door2":
-                SceneManager.LoadScene("World3");
+                SceneManager.LoadScene("World2");
                 break;
 
             case "Door3":
-                SceneManager.LoadScene("End");
+                SceneManager.LoadScene("World3");
                 break;
         }
     }
