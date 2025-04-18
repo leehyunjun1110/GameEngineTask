@@ -93,7 +93,7 @@ public class PlayerController : MonoBehaviour
     public IEnumerator PlayerHurt(int Damage)
     {
         playerHealth -= Damage;
-        if (playerHealth < 0)
+        if (playerHealth <= 0)
         {
             StartCoroutine(PlayerDeath());
         }
@@ -107,9 +107,10 @@ public class PlayerController : MonoBehaviour
     }
     private IEnumerator PlayerDeath()
     {
-        if (playerHealth < 0)
+        if (playerHealth <= 0)
         {
             m_Animator.SetTrigger("Death");
+            isMovable = false;
             yield return new WaitForSeconds(2f);
             SceneManager.LoadScene(SceneManager.GetActiveScene().name);
         }
@@ -184,7 +185,7 @@ public class PlayerController : MonoBehaviour
         float elapsed = 0f;
         float startYScale = 1f;
 
-        // ÄðÅ¸ÀÓ ÁøÇà
+        // ï¿½ï¿½Å¸ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
         while (elapsed < shiftCool)
         {
             elapsed += Time.deltaTime;
@@ -204,7 +205,7 @@ public class PlayerController : MonoBehaviour
 
         if (shiftCooldownUI != null)
         {
-            shiftCooldownUI.localScale = new Vector3(1f, 1f, 1f); // ÃÊ±âÈ­
+            shiftCooldownUI.localScale = new Vector3(1f, 1f, 1f); // ï¿½Ê±ï¿½È­
             shiftCoolPanel.SetActive(false);
         }
 
@@ -252,7 +253,7 @@ public class PlayerController : MonoBehaviour
 
         if (XKeyCooldownUI != null)
         {
-            XKeyCooldownUI.localScale = new Vector3(1f, 1f, 1f); // ÃÊ±âÈ­
+            XKeyCooldownUI.localScale = new Vector3(1f, 1f, 1f); // ï¿½Ê±ï¿½È­
             XKeyCoolPanel.SetActive(false);
         }
 
@@ -299,7 +300,7 @@ public class PlayerController : MonoBehaviour
 
         if (ZKeyCooldownUI != null)
         {
-            ZKeyCooldownUI.localScale = new Vector3(1f, 1f, 1f); // ÃÊ±âÈ­
+            ZKeyCooldownUI.localScale = new Vector3(1f, 1f, 1f); // ï¿½Ê±ï¿½È­
             ZKeyCoolPanel.SetActive(false);
         }
 

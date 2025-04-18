@@ -4,10 +4,10 @@ using UnityEngine;
 public class EnemyFSM : MonoBehaviour
 {
     private enum State 
-    { 
-        Idle, 
-        Move, 
-        Attack 
+    {
+        Idle,
+        Move,
+        Attack
     }
     private State currentState;
 
@@ -17,14 +17,15 @@ public class EnemyFSM : MonoBehaviour
     [SerializeField] private float attackRange = 1f;
     [SerializeField] private float moveSpeed = 2f;
     [SerializeField] private float attackCooldown = 1.5f;
-    public GameObject attackCollider;
 
     [Header("EnemyStats")]
-    public float health = 5.0f;
+    public int health = 5;
+    [SerializeField] private int EnemyAttackDamage = 1;
     [SerializeField] private Animator enemyAnimator;
     private Vector2 originPosition;
     private Rigidbody2D rb;
     private float lastAttackTime;
+    private bool isMovable = true;
 
     private void Start()
     {
@@ -36,12 +37,12 @@ public class EnemyFSM : MonoBehaviour
         if (playerObj != null)
             player = playerObj.transform;
         else
-            Debug.LogWarning("�÷��̾ ã�� �� �����ϴ�. 'Player' �±װ� �ִ��� Ȯ���ϼ���.");
+            Debug.LogWarning("플레이어를 찾을 수 없습니다.");
     }
 
     private void Update()
     {
-        if (health < 0f)
+        if (health <= 0)
         {
             StartCoroutine(DeathCoroutine());
         }
@@ -59,18 +60,11 @@ public class EnemyFSM : MonoBehaviour
                 break;
         }
     }
-    private IEnumerator DeathCoroutine()
-    {
-        enemyAnimator.SetTrigger("Death");
-        yield return new WaitForSeconds(1f);
-        Destroy(this.gameObject);
-        yield break;
-    }
     private void Idle()
     {
         rb.velocity = Vector2.zero;
         float distanceToPlayer = Vector2.Distance(transform.position, player.position);
-        if (distanceToPlayer <= detectionRange)
+        if (distanceToPlayer <= detectionRange && isMovable)
         {
             currentState = State.Move;
         }
@@ -79,10 +73,11 @@ public class EnemyFSM : MonoBehaviour
     {
         float distanceToPlayer = Vector2.Distance(transform.position, player.position);
 
-        if (distanceToPlayer > detectionRange)
+        if (distanceToPlayer > detectionRange && isMovable)
         {
             Vector2 direction = (originPosition - (Vector2)transform.position).normalized;
-            rb.velocity = direction * moveSpeed;
+            if (isMovable)
+                rb.velocity = direction * moveSpeed;
 
             FlipSprite(direction);
 
@@ -92,7 +87,7 @@ public class EnemyFSM : MonoBehaviour
                 currentState = State.Idle;
             }
         }
-        else if (distanceToPlayer <= attackRange)
+        else if (distanceToPlayer <= attackRange && isMovable)
         {
             rb.velocity = Vector2.zero;
             currentState = State.Attack;
@@ -100,17 +95,19 @@ public class EnemyFSM : MonoBehaviour
         else
         {
             Vector2 direction = ((Vector2)player.position - rb.position).normalized;
-            rb.velocity = direction * moveSpeed;
+            if (isMovable)
+                rb.velocity = direction * moveSpeed;
 
             FlipSprite(direction);
         }
     }
+    
     private void Attack()
     {
         enemyAnimator.SetTrigger("Attack");
         float distanceToPlayer = Vector2.Distance(transform.position, player.position);
 
-        if (distanceToPlayer > attackRange)
+        if (distanceToPlayer > attackRange && isMovable)
         {
             currentState = State.Move;
             return;
@@ -122,9 +119,47 @@ public class EnemyFSM : MonoBehaviour
 
         if (Time.time - lastAttackTime >= attackCooldown)
         {
-            attackCollider.SetActive(true);
-            Debug.Log("����");
+            StartCoroutine(PerformAttack());
             lastAttackTime = Time.time;
+        }
+    }
+    private IEnumerator DeathCoroutine()
+    {
+        enemyAnimator.SetTrigger("Death");
+        isMovable = false;
+        yield return new WaitForSeconds(1f);
+        Destroy(this.gameObject);
+        yield break;
+    }
+
+    private IEnumerator PerformAttack()
+    {
+        float duration = 0.2f;
+        float timer = 0f;
+        bool playerHit = false; // 플레이어가 한 번이라도 맞았는지 확인용
+
+        while (timer < duration)
+        {
+            if (!playerHit) // 플레이어가 아직 맞지 않았을 때만 감지
+            {
+                Collider2D[] hitPlayers = Physics2D.OverlapCircleAll(transform.position, attackRange);
+                foreach (Collider2D hit in hitPlayers)
+                {
+                    if (hit.CompareTag("Player"))
+                    {
+                        Debug.Log("플레이어 공격 성공");
+                        PlayerController pc = hit.GetComponent<PlayerController>();
+                        if (pc != null)
+                        {
+                            StartCoroutine(pc.PlayerHurt(EnemyAttackDamage));
+                            playerHit = true;
+                            break;
+                        }
+                    }
+                }
+            }
+            timer += Time.deltaTime;
+            yield return null;
         }
     }
 

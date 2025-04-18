@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class AttackScript : MonoBehaviour
 {
-    [SerializeField] private const float basicAttack = 3f;
+    [SerializeField] private int basicAttack = 3;
     private void OnTriggerEnter2D(Collider2D collision)
     {
         switch(collision.gameObject.tag)
