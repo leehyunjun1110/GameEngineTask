@@ -1,5 +1,36 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &3541040917999639948
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8246243358350164378}
+  m_Layer: 0
+  m_Name: AttackPoint
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8246243358350164378
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3541040917999639948}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.58, y: -0.22, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 7357138058719091635}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &8865084291176380777
 GameObject:
   m_ObjectHideFlags: 0
@@ -104,6 +135,18 @@ PrefabInstance:
       value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 3657393268182499027, guid: 5c82fc9e5634be54687676b6c2060e26, type: 3}
+      propertyPath: ZKeyCool
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 3657393268182499027, guid: 5c82fc9e5634be54687676b6c2060e26, type: 3}
+      propertyPath: firePoint
+      value: 
+      objectReference: {fileID: 8246243358350164378}
+    - target: {fileID: 3657393268182499027, guid: 5c82fc9e5634be54687676b6c2060e26, type: 3}
+      propertyPath: attackCoolDown
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3657393268182499027, guid: 5c82fc9e5634be54687676b6c2060e26, type: 3}
       propertyPath: characterSpeed
       value: 1.5
       objectReference: {fileID: 0}
@@ -111,6 +154,22 @@ PrefabInstance:
       propertyPath: groundCheckPoint
       value: 
       objectReference: {fileID: 2097010859536658524}
+    - target: {fileID: 3657393268182499027, guid: 5c82fc9e5634be54687676b6c2060e26, type: 3}
+      propertyPath: swordSlashPrefab
+      value: 
+      objectReference: {fileID: 4136169039581853291, guid: 7316680412265f64da6119fe3523387d, type: 3}
+    - target: {fileID: 3657393268182499027, guid: 5c82fc9e5634be54687676b6c2060e26, type: 3}
+      propertyPath: swordStingPrefab
+      value: 
+      objectReference: {fileID: 4040065186421628355, guid: 8a1745d1e58a4364ba76a7897e59179b, type: 3}
+    - target: {fileID: 3657393268182499027, guid: 5c82fc9e5634be54687676b6c2060e26, type: 3}
+      propertyPath: XKeyRbAttackspeed
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 3657393268182499027, guid: 5c82fc9e5634be54687676b6c2060e26, type: 3}
+      propertyPath: ZKeyRbAttackspeed
+      value: 15
+      objectReference: {fileID: 0}
     - target: {fileID: 3657393268182499027, guid: 5c82fc9e5634be54687676b6c2060e26, type: 3}
       propertyPath: characterJumpSpace
       value: 200
@@ -122,6 +181,10 @@ PrefabInstance:
     - target: {fileID: 3975392331883599050, guid: 5c82fc9e5634be54687676b6c2060e26, type: 3}
       propertyPath: m_Name
       value: TutoCharacter
+      objectReference: {fileID: 0}
+    - target: {fileID: 3975392331883599050, guid: 5c82fc9e5634be54687676b6c2060e26, type: 3}
+      propertyPath: m_TagString
+      value: Player
       objectReference: {fileID: 0}
     - target: {fileID: 5169568010401205596, guid: 5c82fc9e5634be54687676b6c2060e26, type: 3}
       propertyPath: m_LocalScale.x
@@ -193,6 +256,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 5169568010401205596, guid: 5c82fc9e5634be54687676b6c2060e26, type: 3}
       insertIndex: -1
       addedObject: {fileID: 2097010859536658524}
+    - targetCorrespondingSourceObject: {fileID: 5169568010401205596, guid: 5c82fc9e5634be54687676b6c2060e26, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 8246243358350164378}
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 5c82fc9e5634be54687676b6c2060e26, type: 3}
 --- !u!4 &7357138058719091635 stripped

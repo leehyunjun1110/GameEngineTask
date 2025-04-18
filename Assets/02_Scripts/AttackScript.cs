@@ -4,16 +4,14 @@ using UnityEngine;
 
 public class AttackScript : MonoBehaviour
 {
-    [SerializeField]
-    private PlayerController playerController;
-
+    [SerializeField] private const float basicAttack = 3f;
     private void OnTriggerEnter2D(Collider2D collision)
     {
         switch(collision.gameObject.tag)
         {
             case "Enemy":
-                Destroy(collision.gameObject);
-                playerController.m_Attack.SetActive(false);
+                EnemyFSM enemy = collision.gameObject.GetComponent<EnemyFSM>();
+                enemy.health -= basicAttack;
                 break;
             case "Dummy":
                 DummyScript dummy = collision.gameObject.GetComponent<DummyScript>();
