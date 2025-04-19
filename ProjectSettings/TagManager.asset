@@ -7,6 +7,15 @@ TagManager:
   - Ground
   - Enemy
   - Dummy
+  - Trap
+  - Invincivility
+  - Door
+  - Boundary
+  - SpeedUp
+  - DeadZone
+  - JumpUp
+  - ReturnZone
+  - Boss
   layers:
   - Default
   - TransparentFX

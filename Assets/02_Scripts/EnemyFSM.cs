@@ -3,13 +3,16 @@ using UnityEngine;
 
 public class EnemyFSM : MonoBehaviour
 {
-    private enum State 
+    private enum State
     {
         Idle,
         Move,
         Attack
     }
     private State currentState;
+
+    [Header("isFlying")]
+    [SerializeField] private bool isFlying = false;
 
     [Header("AttackVariables")]
     private Transform player;
@@ -26,10 +29,14 @@ public class EnemyFSM : MonoBehaviour
     private Rigidbody2D rb;
     private float lastAttackTime;
     private bool isMovable = true;
+    private float nowscale;
+    private bool isReturning = false;
+    public bool isPortalVisible = false;
 
     private void Start()
     {
         currentState = State.Idle;
+        nowscale = transform.localScale.x;
         originPosition = transform.position;
         rb = GetComponent<Rigidbody2D>();
         GameObject playerObj = GameObject.FindWithTag("Player");
@@ -60,6 +67,12 @@ public class EnemyFSM : MonoBehaviour
                 break;
         }
     }
+
+    public void Hit()
+    {
+        enemyAnimator.SetTrigger("Hit");
+    }
+
     private void Idle()
     {
         rb.velocity = Vector2.zero;
@@ -69,42 +82,58 @@ public class EnemyFSM : MonoBehaviour
             currentState = State.Move;
         }
     }
+
     private void Move()
     {
         float distanceToPlayer = Vector2.Distance(transform.position, player.position);
 
-        if (distanceToPlayer > detectionRange && isMovable)
-        {
-            Vector2 direction = (originPosition - (Vector2)transform.position).normalized;
-            if (isMovable)
-                rb.velocity = direction * moveSpeed;
+        Vector2 direction;
 
+        if (isReturning)
+        {
+            // 복귀 중: 원래 자리로 이동
+            direction = (originPosition - (Vector2)transform.position).normalized;
+
+            rb.velocity = direction * moveSpeed;
             FlipSprite(direction);
 
+            if (!isFlying) enemyAnimator.SetBool("Run", true);
+
+            // 원래 자리 도달 시 복귀 종료
             if (Vector2.Distance(transform.position, originPosition) < 0.1f)
             {
                 rb.velocity = Vector2.zero;
                 currentState = State.Idle;
+                isReturning = false;
             }
         }
-        else if (distanceToPlayer <= attackRange && isMovable)
+        else if (distanceToPlayer > attackRange && isMovable)
         {
-            rb.velocity = Vector2.zero;
-            currentState = State.Attack;
+            if (isFlying)
+            {
+                direction = ((Vector2)player.position - rb.position).normalized;
+            }
+            else
+            {
+                float xDirection = player.position.x - transform.position.x;
+                direction = new Vector2(xDirection, 0).normalized;
+            }
+
+            rb.velocity = direction * moveSpeed;
+            FlipSprite(direction);
+
+            if (!isFlying) enemyAnimator.SetBool("Run", true);
         }
         else
         {
-            Vector2 direction = ((Vector2)player.position - rb.position).normalized;
-            if (isMovable)
-                rb.velocity = direction * moveSpeed;
-
-            FlipSprite(direction);
+            rb.velocity = Vector2.zero;
+            if (!isFlying) enemyAnimator.SetBool("Run", false);
+            currentState = State.Attack;
         }
     }
-    
+
     private void Attack()
     {
-        enemyAnimator.SetTrigger("Attack");
         float distanceToPlayer = Vector2.Distance(transform.position, player.position);
 
         if (distanceToPlayer > attackRange && isMovable)
@@ -117,14 +146,19 @@ public class EnemyFSM : MonoBehaviour
         Vector2 lookDir = (player.position - transform.position).normalized;
         FlipSprite(lookDir);
 
+        if (!isFlying)
+            enemyAnimator.SetBool("Run", false);
+
         if (Time.time - lastAttackTime >= attackCooldown)
         {
             StartCoroutine(PerformAttack());
             lastAttackTime = Time.time;
         }
     }
+
     private IEnumerator DeathCoroutine()
     {
+        isPortalVisible = true;
         enemyAnimator.SetTrigger("Death");
         isMovable = false;
         yield return new WaitForSeconds(1f);
@@ -136,11 +170,13 @@ public class EnemyFSM : MonoBehaviour
     {
         float duration = 0.2f;
         float timer = 0f;
-        bool playerHit = false; // 플레이어가 한 번이라도 맞았는지 확인용
+        bool playerHit = false;
+
+        enemyAnimator.SetTrigger("Attack");
 
         while (timer < duration)
         {
-            if (!playerHit) // 플레이어가 아직 맞지 않았을 때만 감지
+            if (!playerHit)
             {
                 Collider2D[] hitPlayers = Physics2D.OverlapCircleAll(transform.position, attackRange);
                 foreach (Collider2D hit in hitPlayers)
@@ -168,8 +204,15 @@ public class EnemyFSM : MonoBehaviour
         if (direction.x != 0)
         {
             Vector3 localScale = transform.localScale;
-            localScale.x = direction.x < 0 ? -1f : 1f;
+            localScale.x = direction.x < 0 ? -nowscale : nowscale;
             transform.localScale = localScale;
+        }
+    }
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision.CompareTag("ReturnZone")) // 트리거 오브젝트에 "ReturnZone" 태그 설정 필요
+        {
+            isReturning = true;
         }
     }
 }

@@ -1,10 +1,12 @@
 using System.Runtime.CompilerServices;
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using Unity.VisualScripting;
 using Unity.Mathematics;
+using TMPro;
 
 public class PlayerController : MonoBehaviour
 {
@@ -15,7 +17,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float characterSpeed = 2f;
     [SerializeField] private float characterJumpSpace = 200.0f;
     public GameObject m_Attack;
-    public bool shiftdown = false, isAbleAttack = true, isMovable = true, isShiftJumpable = true, isAbleZKey = true, isAbleXKey = true;
+    public bool shiftdown = false, isAbleAttack = true, isMovable = true, isShiftJumpable = true, isAbleZKey = true, isAbleXKey = true, isInvincivility = false, isSpeedUp = false;
 
     [Header("PlayerJumpFunc")]
     private KeyCode[] jumpKeys = { KeyCode.UpArrow, KeyCode.Space };
@@ -27,14 +29,24 @@ public class PlayerController : MonoBehaviour
     [Header("PlayerVariables")]
     [SerializeField] private float attackCoolDown = 1.1f;
     [SerializeField] private Transform firePoint;
-    public int playerHealth = 3;
+    [SerializeField] private int playerMaxHealth = 3;
+    private int playerHealth;
+    [SerializeField] private GameObject[] playerHealthIcon;
     [SerializeField] private float stunTime = 0.5f;
+    [SerializeField] private float invincibleTime = 3f, speedUpTime = 5f;
     private float originCharacterSpeed;
+    public TextMeshProUGUI inVincibleText;
+    public GameObject givt;
+    private RectTransform givtRect;
+    [SerializeField] private float fadeDuration = 2f;
+    private float currentAlpha = 1f;
 
     [Header("ShiftSkill")]
     [SerializeField] private float shiftCool;
     [SerializeField] private GameObject shiftCoolPanel;
     [SerializeField] private RectTransform shiftCooldownUI;
+    [SerializeField] private float skillJumpSpace = 400.0f;
+    [SerializeField] private float basicJumpSpace = 250.0f;
 
     [Header("ZKeySkill")]
     [SerializeField] private float ZKeyCool;
@@ -59,13 +71,17 @@ public class PlayerController : MonoBehaviour
 
     void Start()
     {
+        playerHealth = playerMaxHealth;
         m_Animator = GetComponent<Animator>();
         m_Transform = GetComponent<Transform>();
+        givtRect = givt.GetComponent<RectTransform>();
         originCharacterSpeed = characterSpeed;
         m_Attack.SetActive(false);
+        givt.SetActive(false);
         shiftCoolPanel.SetActive(false);
         XKeyCoolPanel.SetActive(false);
         ZKeyCoolPanel.SetActive(false);
+        UpdateHealthUI();
     }
 
     void Update()
@@ -74,17 +90,17 @@ public class PlayerController : MonoBehaviour
         Move();
         JumpCheck();
 
-        if (Input.GetKeyDown(KeyCode.A) && isAbleAttack)
+        if (Input.GetKeyDown(KeyCode.A) && isAbleAttack && isMovable)
         {
             StartCoroutine(AttackCheck());
         }
 
-        if (Input.GetKeyDown(KeyCode.X) && isAbleXKey)
+        if (Input.GetKeyDown(KeyCode.X) && isAbleXKey && isMovable)
         {
             StartCoroutine(XKeyAttack());
         }
 
-        if (Input.GetKeyDown(KeyCode.Z) && isAbleZKey)
+        if (Input.GetKeyDown(KeyCode.Z) && isAbleZKey && isMovable)
         {
             StartCoroutine(ZKeyAttack());
         }
@@ -92,17 +108,39 @@ public class PlayerController : MonoBehaviour
 
     public IEnumerator PlayerHurt(int Damage)
     {
-        playerHealth -= Damage;
-        if (playerHealth <= 0)
+        if (!isInvincivility)
         {
-            StartCoroutine(PlayerDeath());
+            if (playerHealth <= 0)
+            {
+                UpdateHealthUI();
+                StartCoroutine(PlayerDeath());
+            }
+            else
+            {
+                m_Animator.SetTrigger("Hurt");
+                UpdateHealthUI();
+                isMovable = false;
+                playerHealth -= Damage;
+                yield return new WaitForSeconds(stunTime);
+                isMovable = true;
+            }
         }
         else
         {
-            m_Animator.SetTrigger("Hurt");
-            isMovable = false;
-            yield return new WaitForSeconds(stunTime);
-            isMovable = true;
+            givt.SetActive(true);
+            currentAlpha = 1f;
+
+            while (currentAlpha > 0f)
+            {
+                currentAlpha -= Time.deltaTime / fadeDuration;
+                currentAlpha = Mathf.Clamp01(currentAlpha);
+                Color c = inVincibleText.color;
+                c.a = currentAlpha;
+                inVincibleText.color = c;
+                yield return null;
+            }
+
+            givt.SetActive(false);
         }
     }
     private IEnumerator PlayerDeath()
@@ -115,7 +153,13 @@ public class PlayerController : MonoBehaviour
             SceneManager.LoadScene(SceneManager.GetActiveScene().name);
         }
     }
-
+    private void UpdateHealthUI()
+    {
+        for (int i = 0; i < playerHealthIcon.Length; i++)
+        {
+            playerHealthIcon[i].SetActive(i < playerHealth);
+        }
+    }
     IEnumerator AttackCheck()
     {
         m_Attack.SetActive(true);
@@ -129,8 +173,6 @@ public class PlayerController : MonoBehaviour
         isAbleAttack = true;
         isMovable = true;
     }
-
-
     private void ShiftCheck()
     {
         if (Input.GetKey(KeyCode.LeftShift))
@@ -146,7 +188,6 @@ public class PlayerController : MonoBehaviour
             m_Animator.SetBool("IsRun", false);
         }
     }
-
     private void JumpCheck()
     {
         if ((Time.time - lastJumpTime > groundCheckCooldown) && GroundCheck() && isMovable)
@@ -159,7 +200,7 @@ public class PlayerController : MonoBehaviour
 
                     m_Animator.SetTrigger("Jump");
 
-                    characterJumpSpace = shiftHeldNow && isShiftJumpable ? 400.0f : 200.0f;
+                    characterJumpSpace = shiftHeldNow && isShiftJumpable ? skillJumpSpace : basicJumpSpace;
 
                     if (shiftHeldNow && isShiftJumpable)
                     {
@@ -174,7 +215,6 @@ public class PlayerController : MonoBehaviour
             }
         }
     }
-
     IEnumerator ShiftJump()
     {
         if (shiftCoolPanel != null)
@@ -211,7 +251,6 @@ public class PlayerController : MonoBehaviour
 
         yield break;
     }
-
     IEnumerator XKeyAttack()
     {
         m_Animator.SetTrigger("XKeyAttack");
@@ -253,7 +292,7 @@ public class PlayerController : MonoBehaviour
 
         if (XKeyCooldownUI != null)
         {
-            XKeyCooldownUI.localScale = new Vector3(1f, 1f, 1f); // �ʱ�ȭ
+            XKeyCooldownUI.localScale = new Vector3(1f, 1f, 1f);
             XKeyCoolPanel.SetActive(false);
         }
 
@@ -300,7 +339,7 @@ public class PlayerController : MonoBehaviour
 
         if (ZKeyCooldownUI != null)
         {
-            ZKeyCooldownUI.localScale = new Vector3(1f, 1f, 1f); // �ʱ�ȭ
+            ZKeyCooldownUI.localScale = new Vector3(1f, 1f, 1f);
             ZKeyCoolPanel.SetActive(false);
         }
 
@@ -321,13 +360,13 @@ public class PlayerController : MonoBehaviour
         }
         return gc;
     }
-
     private void Move()
     {
         if (Input.GetKey(KeyCode.LeftArrow) && isMovable)
         {
             m_Transform.Translate(new Vector2(-characterSpeed, 0) * Time.deltaTime);
             m_Transform.localScale = new Vector3(-1f, 1f);
+            givtRect.localScale = new Vector3(-1f, 1f);
             m_Animator.SetBool("IsWalk", true);
             return;
         }
@@ -335,6 +374,7 @@ public class PlayerController : MonoBehaviour
         {
             m_Transform.Translate(new Vector2(characterSpeed, 0) * Time.deltaTime);
             m_Transform.localScale = new Vector3(1f, 1f);
+            givtRect.localScale = new Vector3(1f, 1f);
             m_Animator.SetBool("IsWalk", true);
             return;
         }
@@ -342,19 +382,54 @@ public class PlayerController : MonoBehaviour
     }
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        switch(collision.gameObject.name)
+        switch(collision.gameObject.tag)
         {
-            case "Door1":
-                SceneManager.LoadScene("World1");
+            case "Invincivility":
+                StartCoroutine(Invincivility());
+                Destroy(collision.gameObject);
                 break;
-
-            case "Door2":
-                SceneManager.LoadScene("World2");
+            case "SpeedUp":
+                StartCoroutine(SpeedUp());
+                Destroy(collision.gameObject);
                 break;
-
-            case "Door3":
-                SceneManager.LoadScene("World3");
+            case "JumpUp":
+                StartCoroutine(JumpUp());
+                Destroy(collision.gameObject);
+                break;
+            case "Door":
+                SceneManager.LoadScene(collision.gameObject.name);
+                break;
+            case "Trap":
+                StartCoroutine(PlayerHurt(1));
+                break;
+            case "DeadZone":
+                SceneManager.LoadScene(SceneManager.GetActiveScene().name);
                 break;
         }
+    }
+    private IEnumerator SpeedUp()
+    {
+        isSpeedUp = true;
+        originCharacterSpeed *= 2;
+        yield return new WaitForSeconds(speedUpTime);
+        originCharacterSpeed /= 2;
+        yield break;
+    }
+    private IEnumerator JumpUp()
+    {
+        isSpeedUp = true;
+        basicJumpSpace *= 1.5f;
+        skillJumpSpace *= 2f;
+        yield return new WaitForSeconds(speedUpTime);
+        basicJumpSpace /= 1.5f;
+        skillJumpSpace /= 2f;
+        yield break;
+    }
+    private IEnumerator Invincivility()
+    {
+        isInvincivility = true;
+        yield return new WaitForSeconds(invincibleTime);
+        isInvincivility = false;
+        yield break;
     }
 }
