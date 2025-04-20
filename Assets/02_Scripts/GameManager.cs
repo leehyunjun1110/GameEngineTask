@@ -9,6 +9,8 @@ public class GameManager : MonoBehaviour
 
     [SerializeField]
     private AudioSource audioSource;
+
+    public bool cleared = false;
     void Awake()
     {
         if (null == instance)
@@ -36,7 +38,10 @@ public class GameManager : MonoBehaviour
     public void StartNextScene()
     {
         audioSource.Play();
-        SceneManager.LoadScene("World1");
+        if (cleared == false)
+            SceneManager.LoadScene("TutorialScene");
+        else
+            SceneManager.LoadScene("World1");
     }
 
     public void StartScene()

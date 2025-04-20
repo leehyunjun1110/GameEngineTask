@@ -30,7 +30,7 @@ public class SkillAttackScript : MonoBehaviour
                 break;
             case "Boss":
                 BossController bossController = collision.gameObject.GetComponent<BossController>();
-                bossController.TakeDamage(attackDamage);
+                bossController.StartCoroutine(bossController.TakeDamage(attackDamage));
                 break;
             case "Dummy":
                 DummyScript dummy = collision.gameObject.GetComponent<DummyScript>();

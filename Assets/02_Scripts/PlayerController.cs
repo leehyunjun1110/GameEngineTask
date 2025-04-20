@@ -68,6 +68,7 @@ public class PlayerController : MonoBehaviour
     public AudioSource audioSource;
     public AudioClip swordAttackSound;
     public AudioClip walkSound;
+    public AudioClip hurtSound;
 
     void Start()
     {
@@ -110,6 +111,13 @@ public class PlayerController : MonoBehaviour
     {
         if (!isInvincivility)
         {
+            if (hurtSound != null)
+            {
+                audioSource.PlayOneShot(hurtSound);
+            }
+
+            CameraController.Instance.Shake(0.2f, 0.2f);
+
             if (playerHealth <= 0)
             {
                 UpdateHealthUI();
