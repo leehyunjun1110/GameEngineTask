@@ -30,16 +30,24 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float attackCoolDown = 1.1f;
     [SerializeField] private Transform firePoint;
     [SerializeField] private int playerMaxHealth = 3;
-    private int playerHealth;
+    [SerializeField] private int playerHealth;
     [SerializeField] private GameObject[] playerHealthIcon;
     [SerializeField] private float stunTime = 0.5f;
     [SerializeField] private float invincibleTime = 3f, speedUpTime = 5f;
     private float originCharacterSpeed;
+    private AudioSource pAs;
     public TextMeshProUGUI inVincibleText;
     public GameObject givt;
     private RectTransform givtRect;
     [SerializeField] private float fadeDuration = 2f;
     private float currentAlpha = 1f;
+
+    [Header("PlayerSounds")]
+    [SerializeField] private AudioClip jumpSound;
+    [SerializeField] private AudioClip attackSound;
+    [SerializeField] private AudioClip xKeySound;
+    [SerializeField] private AudioClip zKeySound;
+    [SerializeField] private AudioClip hitSound;
 
     [Header("ShiftSkill")]
     [SerializeField] private float shiftCool;
@@ -64,25 +72,22 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float XKeyRbAttackspeed;
     private Vector2 Xdirection;
 
-    [Header("AudioSource")]
-    public AudioSource audioSource;
-    public AudioClip swordAttackSound;
-    public AudioClip walkSound;
-    public AudioClip hurtSound;
-
     void Start()
     {
         playerHealth = playerMaxHealth;
         m_Animator = GetComponent<Animator>();
         m_Transform = GetComponent<Transform>();
         givtRect = givt.GetComponent<RectTransform>();
+        pAs = GetComponent<AudioSource>();
         originCharacterSpeed = characterSpeed;
         m_Attack.SetActive(false);
         givt.SetActive(false);
         shiftCoolPanel.SetActive(false);
         XKeyCoolPanel.SetActive(false);
         ZKeyCoolPanel.SetActive(false);
-        UpdateHealthUI();
+        playerHealthIcon[0].SetActive(true);
+        playerHealthIcon[1].SetActive(true);
+        playerHealthIcon[2].SetActive(true);
     }
 
     void Update()
@@ -90,7 +95,10 @@ public class PlayerController : MonoBehaviour
         ShiftCheck();
         Move();
         JumpCheck();
-
+        if (playerHealth <= 0)
+        {
+            StartCoroutine(PlayerDeath());
+        }
         if (Input.GetKeyDown(KeyCode.A) && isAbleAttack && isMovable)
         {
             StartCoroutine(AttackCheck());
@@ -111,24 +119,20 @@ public class PlayerController : MonoBehaviour
     {
         if (!isInvincivility)
         {
-            if (hurtSound != null)
-            {
-                audioSource.PlayOneShot(hurtSound);
-            }
 
             CameraController.Instance.Shake(0.2f, 0.2f);
 
             if (playerHealth <= 0)
             {
-                UpdateHealthUI();
                 StartCoroutine(PlayerDeath());
             }
             else
             {
                 m_Animator.SetTrigger("Hurt");
-                UpdateHealthUI();
                 isMovable = false;
                 playerHealth -= Damage;
+                pAs.clip = hitSound;
+                pAs.Play();
                 yield return new WaitForSeconds(stunTime);
                 isMovable = true;
             }
@@ -150,6 +154,29 @@ public class PlayerController : MonoBehaviour
 
             givt.SetActive(false);
         }
+        switch(playerHealth)
+        {
+            case 3:
+                playerHealthIcon[0].SetActive(true);
+                playerHealthIcon[1].SetActive(true);
+                playerHealthIcon[2].SetActive(true);
+                break;
+            case 2:
+                playerHealthIcon[0].SetActive(true);
+                playerHealthIcon[1].SetActive(true);
+                playerHealthIcon[2].SetActive(false);
+                break;
+            case 1:
+                playerHealthIcon[0].SetActive(true);
+                playerHealthIcon[1].SetActive(false);
+                playerHealthIcon[2].SetActive(false);
+                break;
+            case 0:
+                playerHealthIcon[0].SetActive(false);
+                playerHealthIcon[1].SetActive(false);
+                playerHealthIcon[2].SetActive(false);
+                break;
+        }
     }
     private IEnumerator PlayerDeath()
     {
@@ -157,15 +184,10 @@ public class PlayerController : MonoBehaviour
         {
             m_Animator.SetTrigger("Death");
             isMovable = false;
+            pAs.clip = hitSound;
+            pAs.Play();
             yield return new WaitForSeconds(2f);
             SceneManager.LoadScene(SceneManager.GetActiveScene().name);
-        }
-    }
-    private void UpdateHealthUI()
-    {
-        for (int i = 0; i < playerHealthIcon.Length; i++)
-        {
-            playerHealthIcon[i].SetActive(i < playerHealth);
         }
     }
     IEnumerator AttackCheck()
@@ -174,7 +196,8 @@ public class PlayerController : MonoBehaviour
         m_Animator.SetTrigger("Attack");
         isAbleAttack = false;
         isMovable = false;
-
+        pAs.clip = attackSound;
+        pAs.Play();
         yield return new WaitForSeconds(attackCoolDown);
 
         m_Attack.SetActive(false);
@@ -207,6 +230,8 @@ public class PlayerController : MonoBehaviour
                     bool shiftHeldNow = Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift);
 
                     m_Animator.SetTrigger("Jump");
+                    pAs.clip = jumpSound;
+                    pAs.Play();
 
                     characterJumpSpace = shiftHeldNow && isShiftJumpable ? skillJumpSpace : basicJumpSpace;
 
@@ -264,6 +289,8 @@ public class PlayerController : MonoBehaviour
         m_Animator.SetTrigger("XKeyAttack");
         isAbleXKey = false;
         yield return new WaitForSeconds(0.3f);
+        pAs.clip = xKeySound;
+        pAs.Play();
         Xdirection = m_Transform.transform.localScale.x > 0 ? Vector2.right : Vector2.left;
 
         Quaternion isRight = (Xdirection == Vector2.right ? Quaternion.Euler(0f, 0f, 0f) : Quaternion.Euler(0f, 180f, 0f));
@@ -311,6 +338,8 @@ public class PlayerController : MonoBehaviour
         m_Animator.SetTrigger("ZKeyAttack");
         isAbleZKey = false;
         yield return new WaitForSeconds(0.2f);
+        pAs.clip = zKeySound;
+        pAs.Play();
         Zdirection = m_Transform.transform.localScale.x > 0 ? Vector2.right : Vector2.left;
 
         Quaternion isRight = (Zdirection == Vector2.right ? Quaternion.Euler(0f, 0f, 0f) : Quaternion.Euler(0f, 180f, 0f));

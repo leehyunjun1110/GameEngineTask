@@ -57,7 +57,7 @@ public class BGMScript : MonoBehaviour
 
         switch (sceneName)
         {
-            case "MainMenu":
+            case "StartScene":
                 selectedClip = mainMenuClip;
                 break;
 

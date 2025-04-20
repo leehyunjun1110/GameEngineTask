@@ -13,6 +13,10 @@ public class ButtonSound : MonoBehaviour
         GameManager.Instance.StartScene();
     }
 
+    public void JustSoundPlay()
+    {
+        GameManager.Instance.PlayAudio();
+    }
     public void EndGame()
     {
         GameManager.Instance.EndGame();

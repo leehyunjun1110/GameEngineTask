@@ -12,6 +12,7 @@ public class BossController : MonoBehaviour
     [SerializeField] private Animator animator;
     [SerializeField] private Rigidbody2D rb;
     [SerializeField] private Slider bossHealthSlider;
+    [SerializeField] private AudioSource bas;
 
     [Header("Stats")]
     [SerializeField] private float maxHealth = 50f;
@@ -57,8 +58,6 @@ public class BossController : MonoBehaviour
         bossHealthSlider.maxValue = maxHealth;
         bossHealthSlider.value = currentHealth;
         bossHealthSlider.gameObject.SetActive(false);
-
-        // GameManager 없이 직접 ObjectPool 찾기
         objectPool = GameObject.FindObjectOfType<ObjectPool>();
 
         if (objectPool == null)
@@ -82,6 +81,7 @@ public class BossController : MonoBehaviour
 
         if (horizontalDistance < detectRange && verticalDistance < 3f)
         {
+            bas.Play();
             if (!bossHealthSlider.gameObject.activeSelf)
                 bossHealthSlider.gameObject.SetActive(true);
 
@@ -142,7 +142,6 @@ public class BossController : MonoBehaviour
                 ReturnToOrigin();
                 break;
             case BossState.Dead:
-                SceneManager.LoadScene("End");
                 break;
         }
     }
@@ -252,9 +251,10 @@ public class BossController : MonoBehaviour
     {
         isDead = true;
         animator.SetTrigger("Death");
+        rb.velocity = Vector2.zero;
         yield return new WaitForSeconds(1.5f);
         currentState = BossState.Dead;
-        rb.velocity = Vector2.zero;
+        SceneManager.LoadScene("End");
     }
 
     private IEnumerator Heal()

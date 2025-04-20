@@ -33,6 +33,10 @@ public class EnemyFSM : MonoBehaviour
     private bool isReturning = false;
     public bool isPortalVisible = false;
 
+    [Header("EnemySound")]
+    private AudioSource eAs;
+    [SerializeField] private AudioClip enemyHitSound;
+
     private void Start()
     {
         currentState = State.Idle;

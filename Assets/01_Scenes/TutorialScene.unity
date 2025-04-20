@@ -1000,7 +1000,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 4
   m_Sprite: {fileID: 21300000, guid: c7a89795533f3114ca8fca35af9d69b0, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -7026,11 +7026,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1356708492}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &1078201635 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 3844361281623308907, guid: da3d34176ce742e4dbf5d278166a66c1, type: 3}
-  m_PrefabInstance: {fileID: 4818254664215422342}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1210117094
 GameObject:
   m_ObjectHideFlags: 0
@@ -7695,7 +7690,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 4
   m_Sprite: {fileID: 669928794, guid: 55650c04753500c48a8894e4004aa278, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -7779,7 +7774,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 4
   m_Sprite: {fileID: -1241431503, guid: 55650c04753500c48a8894e4004aa278, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -8122,38 +8117,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 381925337665439553, guid: da3d34176ce742e4dbf5d278166a66c1, type: 3}
-      propertyPath: m_fontColor.b
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 381925337665439553, guid: da3d34176ce742e4dbf5d278166a66c1, type: 3}
-      propertyPath: m_fontColor.g
-      value: 0.0018082482
-      objectReference: {fileID: 0}
-    - target: {fileID: 381925337665439553, guid: da3d34176ce742e4dbf5d278166a66c1, type: 3}
-      propertyPath: m_fontColor.r
-      value: 0.9547169
-      objectReference: {fileID: 0}
-    - target: {fileID: 381925337665439553, guid: da3d34176ce742e4dbf5d278166a66c1, type: 3}
-      propertyPath: m_fontColor32.rgba
-      value: 4278190323
-      objectReference: {fileID: 0}
-    - target: {fileID: 1397694157571926076, guid: da3d34176ce742e4dbf5d278166a66c1, type: 3}
-      propertyPath: givt
-      value: 
-      objectReference: {fileID: 1078201635}
-    - target: {fileID: 1397694157571926076, guid: da3d34176ce742e4dbf5d278166a66c1, type: 3}
-      propertyPath: XKeyCool
-      value: 5
-      objectReference: {fileID: 0}
-    - target: {fileID: 1397694157571926076, guid: da3d34176ce742e4dbf5d278166a66c1, type: 3}
-      propertyPath: stunTime
-      value: 0.8
-      objectReference: {fileID: 0}
-    - target: {fileID: 1397694157571926076, guid: da3d34176ce742e4dbf5d278166a66c1, type: 3}
-      propertyPath: shiftCool
-      value: 3
-      objectReference: {fileID: 0}
     - target: {fileID: 1397694157571926076, guid: da3d34176ce742e4dbf5d278166a66c1, type: 3}
       propertyPath: XKeyCoolPanel
       value: 
@@ -8171,10 +8134,6 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 1969639232}
     - target: {fileID: 1397694157571926076, guid: da3d34176ce742e4dbf5d278166a66c1, type: 3}
-      propertyPath: inVincibleTime
-      value: 6
-      objectReference: {fileID: 0}
-    - target: {fileID: 1397694157571926076, guid: da3d34176ce742e4dbf5d278166a66c1, type: 3}
       propertyPath: shiftCoolPanel
       value: 
       objectReference: {fileID: 414339237}
@@ -8182,26 +8141,6 @@ PrefabInstance:
       propertyPath: shiftCooldownUI
       value: 
       objectReference: {fileID: 414339238}
-    - target: {fileID: 1397694157571926076, guid: da3d34176ce742e4dbf5d278166a66c1, type: 3}
-      propertyPath: playerHeart.Array.size
-      value: 3
-      objectReference: {fileID: 0}
-    - target: {fileID: 1397694157571926076, guid: da3d34176ce742e4dbf5d278166a66c1, type: 3}
-      propertyPath: playerHeart.Array.data[0]
-      value: 
-      objectReference: {fileID: 2113332350}
-    - target: {fileID: 1397694157571926076, guid: da3d34176ce742e4dbf5d278166a66c1, type: 3}
-      propertyPath: playerHeart.Array.data[1]
-      value: 
-      objectReference: {fileID: 1980721644}
-    - target: {fileID: 1397694157571926076, guid: da3d34176ce742e4dbf5d278166a66c1, type: 3}
-      propertyPath: playerHeart.Array.data[2]
-      value: 
-      objectReference: {fileID: 370701659}
-    - target: {fileID: 1397694157571926076, guid: da3d34176ce742e4dbf5d278166a66c1, type: 3}
-      propertyPath: playerHealthIcon.Array.size
-      value: 3
-      objectReference: {fileID: 0}
     - target: {fileID: 1397694157571926076, guid: da3d34176ce742e4dbf5d278166a66c1, type: 3}
       propertyPath: playerHealthIcon.Array.data[0]
       value: 
@@ -8218,8 +8157,8 @@ PrefabInstance:
       propertyPath: m_Name
       value: Character
       objectReference: {fileID: 0}
-    - target: {fileID: 3844361281623308907, guid: da3d34176ce742e4dbf5d278166a66c1, type: 3}
-      propertyPath: m_IsActive
+    - target: {fileID: 4282932313019098048, guid: da3d34176ce742e4dbf5d278166a66c1, type: 3}
+      propertyPath: m_PlayOnAwake
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7357138058719091635, guid: da3d34176ce742e4dbf5d278166a66c1, type: 3}

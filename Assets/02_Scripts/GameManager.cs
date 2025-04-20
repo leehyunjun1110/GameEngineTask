@@ -50,6 +50,11 @@ public class GameManager : MonoBehaviour
         SceneManager.LoadScene("StartScene");
     }
 
+    public void PlayAudio()
+    {
+        audioSource.Play();
+    }
+
     public void EndGame()
     {
         audioSource.Play();
