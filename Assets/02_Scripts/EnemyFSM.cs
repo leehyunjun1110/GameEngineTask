@@ -1,5 +1,7 @@
 using System.Collections;
+using UnityEditor.SearchService;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class EnemyFSM : MonoBehaviour
 {
@@ -10,6 +12,8 @@ public class EnemyFSM : MonoBehaviour
         Attack
     }
     private State currentState;
+
+    private GameManager gameManager;
 
     [Header("isFlying")]
     [SerializeField] private bool isFlying = false;
@@ -44,7 +48,7 @@ public class EnemyFSM : MonoBehaviour
         originPosition = transform.position;
         rb = GetComponent<Rigidbody2D>();
         GameObject playerObj = GameObject.FindWithTag("Player");
-
+        gameManager = FindObjectOfType<GameManager>();
         if (playerObj != null)
             player = playerObj.transform;
         else
@@ -166,6 +170,7 @@ public class EnemyFSM : MonoBehaviour
         enemyAnimator.SetTrigger("Death");
         isMovable = false;
         yield return new WaitForSeconds(1f);
+        gameManager.SetCurrentScore(SceneManager.GetActiveScene().buildIndex);
         Destroy(this.gameObject);
         yield break;
     }

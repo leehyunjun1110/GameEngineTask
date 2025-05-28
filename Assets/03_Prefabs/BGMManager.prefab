@@ -43,7 +43,7 @@ AudioSource:
   m_Enabled: 1
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
-  m_audioClip: {fileID: 8300000, guid: be5d143bf9c793f4c884814dcc1e1da7, type: 3}
+  m_audioClip: {fileID: 0}
   m_PlayOnAwake: 1
   m_Volume: 1
   m_Pitch: 1
@@ -141,3 +141,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: da7fd1499e544c34d965a860e18eb027, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  mainMenuClip: {fileID: 8300000, guid: 49b95cb3d7059f245a5bc3e7d16458d8, type: 3}
+  tutorialClip: {fileID: 8300000, guid: 479da50738cf6a743a72e671ffa2c538, type: 3}
+  world1Clip: {fileID: 8300000, guid: 5da8db48f3b55934ea0b188bbccf675d, type: 3}
+  world2Clip: {fileID: 8300000, guid: 5c4ea91db713e864c8adb27606b9eaf2, type: 3}
+  world3Clip: {fileID: 8300000, guid: 70873894b007611429d55af577583fcb, type: 3}
+  world4Clip: {fileID: 8300000, guid: 03ccedf6a1b957c409b574913f9bee7b, type: 3}
+  endingClip: {fileID: 8300000, guid: 49b95cb3d7059f245a5bc3e7d16458d8, type: 3}

@@ -7,6 +7,7 @@ using UnityEngine.SceneManagement;
 using Unity.VisualScripting;
 using Unity.Mathematics;
 using TMPro;
+using UnityEditor.SceneManagement;
 
 public class PlayerController : MonoBehaviour
 {
@@ -41,6 +42,7 @@ public class PlayerController : MonoBehaviour
     private RectTransform givtRect;
     [SerializeField] private float fadeDuration = 2f;
     private float currentAlpha = 1f;
+    private GameManager gameManager;
 
     [Header("PlayerSounds")]
     [SerializeField] private AudioClip jumpSound;
@@ -74,6 +76,7 @@ public class PlayerController : MonoBehaviour
 
     void Start()
     {
+        gameManager = FindObjectOfType<GameManager>();
         playerHealth = playerMaxHealth;
         m_Animator = GetComponent<Animator>();
         m_Transform = GetComponent<Transform>();
@@ -434,6 +437,9 @@ public class PlayerController : MonoBehaviour
                 Destroy(collision.gameObject);
                 break;
             case "Door":
+                if (SceneManager.GetActiveScene().name == "TutorialScene")
+                    gameManager.SetCurrentScore(-1);
+                gameManager.GetCurrentScore();
                 SceneManager.LoadScene(collision.gameObject.name);
                 break;
             case "Trap":

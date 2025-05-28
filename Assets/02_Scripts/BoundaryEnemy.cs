@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class BoundaryEnemy : MonoBehaviour
 {
@@ -18,9 +19,11 @@ public class BoundaryEnemy : MonoBehaviour
     private bool isMovingRight = true, isMovable = true;
     private Animator enemyAni;
     private float currentScale;
+    private GameManager gameManager;
 
     private void Start()
     {
+        gameManager = FindObjectOfType<GameManager>();
         enemyAni = GetComponent<Animator>();
         rb = GetComponent<Rigidbody2D>();
         currentScale = transform.localScale.x;
@@ -61,6 +64,7 @@ public class BoundaryEnemy : MonoBehaviour
         isPortalVisible = true;
         enemyAni.SetTrigger("Death");
         yield return new WaitForSeconds(1f);
+        gameManager.SetCurrentScore(SceneManager.GetActiveScene().buildIndex);
         Destroy(this.gameObject);
         yield break;
     }
